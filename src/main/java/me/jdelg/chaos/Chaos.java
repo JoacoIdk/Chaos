@@ -73,6 +73,7 @@ public class Chaos {
         consoleManager.registerCommand("run", new RunCommand());
         consoleManager.registerCommand("stop", new StopCommand());
         consoleManager.registerCommand("kill", new KillCommand());
+        consoleManager.registerCommand("delete", new DeleteCommand());
         consoleManager.registerCommand("platforms", new PlatformsCommand());
         consoleManager.registerCommand("profiles", new ProfilesCommand());
         consoleManager.registerCommand("apply", new ApplyCommand());

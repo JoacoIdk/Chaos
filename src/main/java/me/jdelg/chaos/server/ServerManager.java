@@ -2,6 +2,7 @@ package me.jdelg.chaos.server;
 
 import lombok.Getter;
 import me.jdelg.chaos.Chaos;
+import me.jdelg.chaos.util.FileUtil;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -50,6 +51,12 @@ public class ServerManager {
         servers.add(server);
 
         return server;
+    }
+
+    public void delete(Server server) {
+        FileUtil.deleteRecursive(server.path());
+
+        servers.remove(server);
     }
 
     public Server serverByName(String name) {

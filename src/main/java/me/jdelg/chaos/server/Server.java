@@ -2,6 +2,7 @@ package me.jdelg.chaos.server;
 
 import lombok.Getter;
 import lombok.Setter;
+import me.jdelg.chaos.util.FileUtil;
 import me.jdelg.hermes.type.Status;
 
 import java.io.*;
@@ -16,6 +17,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 @Getter
 public class Server {
@@ -60,7 +62,7 @@ public class Server {
             );
         }
 
-        String download = platform.download();
+        String download = platform.link();
         String[] parameterNames = platform.parameters();
 
         for (int i = 0; i < parameterNames.length; i++)
