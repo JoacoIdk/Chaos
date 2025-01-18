@@ -5,6 +5,7 @@ import me.jdelg.chaos.console.Command;
 import me.jdelg.chaos.console.Sender;
 import me.jdelg.chaos.server.Server;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 public class RunCommand implements Command {
@@ -29,6 +30,11 @@ public class RunCommand implements Command {
             return;
         }
 
-        server.run(command);
+        try {
+            server.run(command);
+        } catch (IOException e) {
+            e.printStackTrace();
+            sender.sendMessage("<red>Could not run command!</red> <yellow>Information has been printed to the console.</yellow>");
+        }
     }
 }

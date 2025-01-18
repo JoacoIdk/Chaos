@@ -1,12 +1,8 @@
 package me.jdelg.chaos.storage;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -17,8 +13,7 @@ public class Storage {
     private final Path path;
     private final Map<String, String> data;
 
-    @SneakyThrows
-    public Storage(Path path) {
+    public Storage(Path path) throws IOException {
         this.path = path;
         this.data = new HashMap<>();
 
@@ -34,8 +29,7 @@ public class Storage {
         stream.close();
     }
     
-    @SneakyThrows
-    public void save() {
+    public void save() throws IOException {
         OutputStream stream = Files.newOutputStream(path);
         DataOutputStream output = new DataOutputStream(stream);
 

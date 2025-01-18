@@ -1,37 +1,46 @@
 package me.jdelg.chaos.server;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 import me.jdelg.chaos.Chaos;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 @Getter
 public class ServerManager {
+    private final Logger logger;
     private final Path serversFolder;
     private final Path profilesFolder;
     private final List<Server> servers;
     private final List<Profile> profiles;
 
-    @SneakyThrows
     public ServerManager(Path serversFolder, Path profilesFolder) {
+        this.logger = Logger.getLogger("ServerManager");
         this.serversFolder = serversFolder;
         this.profilesFolder = profilesFolder;
         this.servers = new ArrayList<>();
         this.profiles = new ArrayList<>();
 
-        Files.createDirectories(serversFolder);
-        Files.createDirectories(profilesFolder);
+        try {
+            Files.createDirectories(serversFolder);
+            Files.createDirectories(profilesFolder);
+        } catch (IOException e) {
+            logger.severe("Unable to create server and/or profile folders.");
+            e.printStackTrace();
+            return;
+        }
 
         reload(true);
     }
 
-    public Server create(String name, Platform platform, String[] parameters) {
+    public Server create(String name, Platform platform, String[] parameters) throws IOException, URISyntaxException {
         if (name.equals(Chaos.NAME) || !name.matches("[a-zA-Z0-9-_]+"))
             throw new IllegalStateException("Cannot create server");
 
@@ -64,7 +73,6 @@ public class ServerManager {
                 .orElse(null);
     }
 
-    @SneakyThrows
     public void reload(boolean force) {
         Stream<Path> stream;
 
@@ -79,27 +87,60 @@ public class ServerManager {
                 .map(Server::path)
                 .toList();
 
-        stream = Files.list(serversFolder)
+        try {
+            stream = Files.list(serversFolder)
                 .filter(path -> path.getFileName().toString().matches("[a-zA-Z0-9-_]+"))
                 .filter(path -> !serverPaths.contains(path));
 
-        stream.forEach(path -> servers.add(new Server(path)));
-        stream.close();
+            stream.forEach(path -> {
+                try {
+                    servers.add(new Server(path));
+                } catch (IOException e) {
+                    logger.warning("Unable to load server %s.".formatted(path.getFileName().toString()));
+                    e.printStackTrace();
+                }
+            });
+            stream.close();
+        } catch (IOException e) {
+            logger.severe("Unable to reload servers.");
+            e.printStackTrace();
+        }
 
         // Profiles
 
         profiles.clear();
 
-        stream = Files.list(profilesFolder)
+        try {
+            stream = Files.list(profilesFolder)
                 .filter(path -> path.getFileName().toString().matches("[a-zA-Z0-9-_]+"));
 
-        stream.forEach(path -> profiles.add(new Profile(path)));
-        stream.close();
+            stream.forEach(path -> {
+                try {
+                    profiles.add(new Profile(path));
+                } catch (IOException e) {
+                    logger.warning("Unable to load profile %s.".formatted(path.getFileName().toString()));
+                    e.printStackTrace();
+                }
+            });
+
+            stream.close();
+        } catch (IOException e) {
+            logger.severe("Unable to reload profiles.");
+            e.printStackTrace();
+        }
     }
 
     public void stopAll() {
         servers.stream()
                 .filter(Server::running)
-                .forEach(Server::stop);
+                .forEach(server -> {
+                    try {
+                        server.stop();
+                    } catch (IOException e) {
+                        logger.warning("Error while stopping server %s, killing...".formatted(server.name()));
+                        e.printStackTrace();
+                        server.kill();
+                    }
+                });
     }
 }

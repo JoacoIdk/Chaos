@@ -5,6 +5,7 @@ import me.jdelg.chaos.console.Command;
 import me.jdelg.chaos.console.Sender;
 import me.jdelg.chaos.server.Profile;
 
+import java.io.IOException;
 import java.util.stream.Collectors;
 
 public class ProfilesCommand implements Command {
@@ -31,13 +32,18 @@ public class ProfilesCommand implements Command {
             return;
         }
 
-        sender.sendMessage(
-                "<blue>Profile %s\nPlatform: %s\nListing: %s</blue>"
-                .formatted(
-                        name,
-                        profile.platform(),
-                        profile.listing().stream().map(path -> "\n- " + path).collect(Collectors.joining(""))
-                )
-        );
+        try {
+            sender.sendMessage(
+                    "<blue>Profile %s\nPlatform: %s\nListing: %s</blue>"
+                    .formatted(
+                            name,
+                            profile.platform(),
+                            profile.listing().stream().map(path -> "\n- " + path).collect(Collectors.joining(""))
+                    )
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+            sender.sendMessage("<red>Error while listing profile!</red> <yellow>Information has been printed to the console.</yellow>");
+        }
     }
 }

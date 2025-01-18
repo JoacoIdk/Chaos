@@ -22,7 +22,8 @@ public class ConsoleReceiver implements Receiver {
 
         PacketSender sender = new PacketSender(
                 commandPacket.entityType(),
-                commandPacket.entityName()
+                commandPacket.entityName(),
+                Chaos.get().hermes()
         );
 
         Chaos.get().consoleManager().run(sender, commandPacket.command());

@@ -5,6 +5,8 @@ import me.jdelg.chaos.console.Command;
 import me.jdelg.chaos.console.Sender;
 import me.jdelg.chaos.server.Server;
 
+import java.io.IOException;
+
 public class StopCommand implements Command {
     @Override
     public void execute(Sender sender, String[] args) {
@@ -26,7 +28,13 @@ public class StopCommand implements Command {
             return;
         }
 
-        server.stop();
         sender.sendMessage("<green>Stopping server %s.</green>".formatted(server.name()));
+
+        try {
+            server.stop();
+        } catch (IOException e) {
+            e.printStackTrace();
+            sender.sendMessage("<red>Could not stop server!</red> <yellow>Use \"kill <server>\" to kill the server.</yellow>");
+        }
     }
 }

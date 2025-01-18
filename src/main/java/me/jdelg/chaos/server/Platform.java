@@ -1,9 +1,9 @@
 package me.jdelg.chaos.server;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,8 +50,7 @@ public enum Platform {
         this.stop = stop;
     }
 
-    @SneakyThrows
-    public static Platform fromPath(Path path) {
+    public static Platform fromPath(Path path) throws IOException {
         List<String> classNames = new ArrayList<>();
         InputStream stream = Files.newInputStream(path);
         ZipInputStream zip = new ZipInputStream(stream);

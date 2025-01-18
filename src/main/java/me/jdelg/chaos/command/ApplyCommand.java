@@ -6,6 +6,8 @@ import me.jdelg.chaos.console.Sender;
 import me.jdelg.chaos.server.Profile;
 import me.jdelg.chaos.server.Server;
 
+import java.io.IOException;
+
 public class ApplyCommand implements Command {
     @Override
     public void execute(Sender sender, String[] args) {
@@ -37,7 +39,13 @@ public class ApplyCommand implements Command {
             return;
         }
 
-        profile.apply(server);
+        try {
+            profile.apply(server);
+        } catch (IOException e) {
+            e.printStackTrace();
+            sender.sendMessage("<red>Could not apply profile to server!</red> <yellow>Information has been printed to the console.</yellow>");
+        }
+
         sender.sendMessage("<green>Applied profile %s to server %s.</green>".formatted(profile.name(), server.name()));
     }
 }

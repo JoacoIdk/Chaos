@@ -6,6 +6,8 @@ import me.jdelg.chaos.console.Sender;
 import me.jdelg.chaos.server.Platform;
 import me.jdelg.chaos.server.Server;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 
 public class CreateCommand implements Command {
@@ -32,7 +34,15 @@ public class CreateCommand implements Command {
             return;
         }
 
-        Server server = Chaos.get().serverManager().create(name, platform, parameters);
+        Server server = null;
+
+        try {
+            server = Chaos.get().serverManager().create(name, platform, parameters);
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+            sender.sendMessage("<red>Could not create server!</red> <yellow>Are you using the right parameters?</yellow>");
+            return;
+        }
 
         sender.sendMessage(
                 "<green>Created server %s on path %s</green>"

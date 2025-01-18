@@ -5,6 +5,8 @@ import me.jdelg.chaos.console.Command;
 import me.jdelg.chaos.console.Sender;
 import me.jdelg.chaos.server.Server;
 
+import java.io.IOException;
+
 public class StartCommand implements Command {
     @Override
     public void execute(Sender sender, String[] args) {
@@ -26,7 +28,13 @@ public class StartCommand implements Command {
             return;
         }
 
-        server.start();
         sender.sendMessage("<green>Starting server %s.</green>".formatted(server.name()));
+
+        try {
+            server.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+            sender.sendMessage("<red>Could not start server!</red> <yellow>Information has been printed to the console.</yellow>");
+        }
     }
 }

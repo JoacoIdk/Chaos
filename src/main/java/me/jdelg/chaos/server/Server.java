@@ -2,16 +2,10 @@ package me.jdelg.chaos.server;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import me.jdelg.hermes.type.Status;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.URL;
+import java.io.*;
+import java.net.*;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
@@ -27,8 +21,8 @@ import java.util.logging.Logger;
 public class Server {
     private final Path path;
     private final String name;
-    private final Platform platform;
     private final Logger logger;
+    private final Platform platform;
     private final String secret;
 
     private Process process = null;
@@ -43,12 +37,11 @@ public class Server {
     @Setter
     private boolean logging = true;
 
-    @SneakyThrows
-    public Server(Path path, Platform platform, String[] parameters) {
+    public Server(Path path, Platform platform, String[] parameters) throws IOException, URISyntaxException {
         this.path = path;
         this.name = path.getFileName().toString();
-        this.platform = platform;
         this.logger = Logger.getLogger("Server " + name);
+        this.platform = platform;
         this.secret = Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes());
 
         Path secretPath = path.resolve("secret.txt");
@@ -57,6 +50,15 @@ public class Server {
 
         Files.createFile(secretPath);
         Files.writeString(secretPath, secret);
+
+        if (platform.eula()) {
+            Files.writeString(
+                    path.resolve("eula.txt"),
+                    "eula=TRUE",
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING
+            );
+        }
 
         String download = platform.download();
         String[] parameterNames = platform.parameters();
@@ -75,24 +77,17 @@ public class Server {
         channel.close();
         stream.close();
 
-        if (!platform.eula())
-            return;
-
-        Files.writeString(
-                path.resolve("eula.txt"),
-                "eula=TRUE",
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING
-        );
+        logger.info("Created server.");
     }
 
-    @SneakyThrows
-    public Server(Path path) {
+    public Server(Path path) throws IOException {
         this.path = path;
         this.name = path.getFileName().toString();
-        this.platform = Platform.fromPath(path.resolve("server.jar"));
         this.logger = Logger.getLogger("Server - " + name);
+        this.platform = Platform.fromPath(path.resolve("server.jar"));
         this.secret = Files.readString(path.resolve("secret.txt"));
+
+        logger.info("Loaded server.");
     }
 
     public boolean running() {
@@ -102,8 +97,7 @@ public class Server {
         return process.isAlive();
     }
 
-    @SneakyThrows
-    public void start() {
+    public void start() throws IOException {
         if (running())
             throw new IllegalStateException("Process is already running!");
 
@@ -114,10 +108,17 @@ public class Server {
 
         Path starter = path.resolve("starter.txt");
 
-        if (Files.exists(starter))
+        try {
+            if (!Files.exists(starter))
+                throw new Exception("Jump to catch block");
+
             command.addAll(List.of(Files.readString(starter).split(" ")));
-        else
+        } catch (Exception e) {
+            if (e instanceof IOException)
+                logger.warning("Unable to read starter.txt file, using default command.");
+
             command.addAll(List.of("-Xms1G", "-Xmx2G", "-jar", "server.jar", "nogui"));
+        }
 
         ProcessBuilder builder = new ProcessBuilder();
         builder.command(command);
@@ -145,8 +146,7 @@ public class Server {
         status = Status.OFFLINE;
     }
 
-    @SneakyThrows
-    public void run(String command) {
+    public void run(String command) throws IOException {
         if (!running())
             throw new IllegalStateException("Proccess is not running!");
 
@@ -155,30 +155,37 @@ public class Server {
         output.flush();
     }
 
-    @SneakyThrows
     private void inputLoop() {
         if (!running())
             return;
 
-        String line = input.readLine();
-        logger.info(line);
+        try {
+            String line = input.readLine();
+            logger.info(line);
+        } catch (IOException e) {
+            logger.warning("Error while reading input.");
+            throw new RuntimeException(e);
+        }
 
         inputLoop();
     }
 
-    @SneakyThrows
     private void errorLoop() {
         if (!running())
             return;
 
-        String line = error.readLine();
-        logger.severe(line);
+        try {
+            String line = error.readLine();
+            logger.severe(line);
+        } catch (IOException e) {
+            logger.warning("Error while reading error.");
+            throw new RuntimeException(e);
+        }
 
         errorLoop();
     }
 
-    @SneakyThrows
-    public void stop() {
+    public void stop() throws IOException {
         if (!running())
             throw new IllegalStateException("Proccess is not running!");
 

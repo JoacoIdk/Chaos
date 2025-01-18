@@ -1,7 +1,6 @@
 package me.jdelg.chaos;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 import me.jdelg.chaos.command.*;
 import me.jdelg.chaos.connection.Broadcaster;
 import me.jdelg.chaos.connection.ConsoleReceiver;
@@ -13,6 +12,7 @@ import me.jdelg.hermes.network.ServerNetwork;
 
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -32,11 +32,20 @@ public class Chaos {
     private final Hermes hermes;
     private final ConsoleManager consoleManager;
 
-    @SneakyThrows
     public Chaos(Logger logger) {
         long millis = System.currentTimeMillis();
 
         chaos = this;
+
+        InetAddress address = null;
+
+        try {
+            address = InetAddress.getByName(HOST);
+        } catch (UnknownHostException e) {
+            logger.severe("Unable to get host address.");
+            e.printStackTrace();
+            System.exit(1);
+        }
 
         this.logger = logger;
         this.path = Path.of(".");
@@ -48,7 +57,7 @@ public class Chaos {
                 path.resolve("storage")
         );
         this.hermes = new Hermes(
-                InetAddress.getByName(HOST),
+                address,
                 PORT,
                 new ServerNetwork()
         );

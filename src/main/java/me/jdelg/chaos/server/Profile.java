@@ -1,8 +1,8 @@
 package me.jdelg.chaos.server;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -14,15 +14,13 @@ public class Profile {
     private final String name;
     private final Platform platform;
 
-    @SneakyThrows
-    public Profile(Path path) {
+    public Profile(Path path) throws IOException {
         this.path = path;
         this.name = path.getFileName().toString();
         this.platform = Platform.fromString(Files.readString(path.resolve("platform.txt")));
     }
 
-    @SneakyThrows
-    public List<Path> listing() {
+    public List<Path> listing() throws IOException {
         Stream<Path> stream = Files.walk(path)
                 .filter(path -> !path.getFileName().toString().startsWith("."));
         List<Path> list = stream.toList();
@@ -32,8 +30,7 @@ public class Profile {
         return list;
     }
 
-    @SneakyThrows
-    public void apply(Server server) {
+    public void apply(Server server) throws IOException {
         if (server.running())
             throw new IllegalStateException("Server is currently running!");
 
