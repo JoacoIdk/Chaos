@@ -23,7 +23,8 @@ public class Profile {
 
     @SneakyThrows
     public List<Path> listing() {
-        Stream<Path> stream = Files.walk(path);
+        Stream<Path> stream = Files.walk(path)
+                .filter(path -> !path.getFileName().toString().startsWith("."));
         List<Path> list = stream.toList();
 
         stream.close();

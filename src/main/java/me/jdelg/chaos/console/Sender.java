@@ -1,13 +1,11 @@
 package me.jdelg.chaos.console;
 
+import me.jdelg.hermes.type.EntityType;
+import net.kyori.adventure.text.Component;
+
 public interface Sender {
-    Type type();
+    EntityType type();
     String name();
     void sendMessage(String message);
-
-    enum Type {
-        CONSOLE,
-        SERVER,
-        PLAYER
-    }
+    void sendMessage(Component component);
 }

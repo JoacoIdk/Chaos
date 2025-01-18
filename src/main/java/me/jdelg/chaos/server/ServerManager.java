@@ -1,13 +1,17 @@
 package me.jdelg.chaos.server;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
+import me.jdelg.chaos.Chaos;
 
+import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Getter
 public class ServerManager {
     private final Path serversFolder;
     private final Path profilesFolder;
@@ -28,6 +32,9 @@ public class ServerManager {
     }
 
     public Server create(String name, Platform platform, String[] parameters) {
+        if (name.equals(Chaos.NAME) || !name.matches("[a-zA-Z0-9-_]+"))
+            throw new IllegalStateException("Cannot create server");
+
         Path path = serversFolder.resolve(name);
         Server server = new Server(path, platform, parameters);
 
@@ -39,6 +46,13 @@ public class ServerManager {
     public Server serverByName(String name) {
         return servers.stream()
                 .filter(server -> server.name().equals(name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Server serverByAddress(InetAddress address) {
+        return servers.stream()
+                .filter(server -> server.address().equals(address))
                 .findFirst()
                 .orElse(null);
     }
@@ -65,16 +79,19 @@ public class ServerManager {
                 .map(Server::path)
                 .toList();
 
-        stream = Files.list(serversFolder);
+        stream = Files.list(serversFolder)
+                .filter(path -> path.getFileName().toString().matches("[a-zA-Z0-9-_]+"))
+                .filter(path -> !serverPaths.contains(path));
 
-        stream.filter(path -> !serverPaths.contains(path)).forEach(path -> servers.add(new Server(path)));
+        stream.forEach(path -> servers.add(new Server(path)));
         stream.close();
 
         // Profiles
 
         profiles.clear();
 
-        stream = Files.list(profilesFolder);
+        stream = Files.list(profilesFolder)
+                .filter(path -> path.getFileName().toString().matches("[a-zA-Z0-9-_]+"));
 
         stream.forEach(path -> profiles.add(new Profile(path)));
         stream.close();

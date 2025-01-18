@@ -5,15 +5,18 @@ import me.jdelg.chaos.console.Command;
 import me.jdelg.chaos.console.Sender;
 import me.jdelg.chaos.server.Server;
 
-public class StopCommand implements Command {
+import java.util.Arrays;
+
+public class RunCommand implements Command {
     @Override
     public void execute(Sender sender, String[] args) {
-        if (args.length < 1) {
-            sender.sendMessage("<red>Wrong usage!</red> <yellow>Use \"stop <name>\"</yellow>");
+        if (args.length < 2) {
+            sender.sendMessage("<red>Wrong usage!</red> <yellow>Use \"run <name> <command...>\"</yellow>");
             return;
         }
 
         String name = args[0];
+        String command = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
         Server server = Chaos.get().serverManager().serverByName(name);
 
         if (server == null) {
@@ -26,7 +29,6 @@ public class StopCommand implements Command {
             return;
         }
 
-        server.stop();
-        sender.sendMessage("<green>Stopping server %s.</green>".formatted(server.name()));
+        server.run(command);
     }
 }

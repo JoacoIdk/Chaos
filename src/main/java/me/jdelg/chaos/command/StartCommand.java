@@ -5,11 +5,11 @@ import me.jdelg.chaos.console.Command;
 import me.jdelg.chaos.console.Sender;
 import me.jdelg.chaos.server.Server;
 
-public class StopCommand implements Command {
+public class StartCommand implements Command {
     @Override
     public void execute(Sender sender, String[] args) {
         if (args.length < 1) {
-            sender.sendMessage("<red>Wrong usage!</red> <yellow>Use \"stop <name>\"</yellow>");
+            sender.sendMessage("<red>Wrong usage!</red> <yellow>Use \"start <name>\"</yellow>");
             return;
         }
 
@@ -21,12 +21,12 @@ public class StopCommand implements Command {
             return;
         }
 
-        if (!server.running()) {
-            sender.sendMessage("<red>That server is not running!</red> <yellow>Use \"start <name>\" to start the server.</yellow>");
+        if (server.running()) {
+            sender.sendMessage("<red>That server is already running!</red> <yellow>Use \"stop <name>\" to stop the server.</yellow>");
             return;
         }
 
-        server.stop();
-        sender.sendMessage("<green>Stopping server %s.</green>".formatted(server.name()));
+        server.start();
+        sender.sendMessage("<green>Starting server %s.</green>".formatted(server.name()));
     }
 }

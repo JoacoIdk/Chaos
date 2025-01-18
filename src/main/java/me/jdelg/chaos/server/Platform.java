@@ -18,32 +18,36 @@ public enum Platform {
     PAPER(
             "https://api.papermc.io/v2/projects/paper/versions/<version>/builds/<build>/downloads/paper-<version>-<build>.jar",
             new String[]{"version", "build"},
-            "org.bukkit.Bukkit",
-            true
+            "io.papermc.paperclip.Main",
+            true,
+            "stop"
     ),
     VELOCITY(
             "https://api.papermc.io/v2/projects/velocity/versions/<version>/builds/<build>/downloads/velocity-<version>-<build>.jar",
             new String[]{"version", "build"},
             "com.velocitypowered.api.proxy.ProxyServer",
-            false
+            false,
+            "stop"
     ),
     //SPONGE(
     //        "https://repo.spongepowered.org/repository/maven-releases/org/spongepowered/sponge<type>/<version>-<build>/sponge<type>-<version>-<build>-universal.jar",
     //        new String[]{"version", "build", "type"},
     //        true
     //),
-    UNKNOWN(null, null, null, false);
+    UNKNOWN(null, null, null, false, null);
 
     private final String download;
     private final String[] parameters;
     private final String identifier;
     private final boolean eula;
+    private final String stop;
 
-    Platform(String download, String[] parameters, String identifier, boolean eula) {
+    Platform(String download, String[] parameters, String identifier, boolean eula, String stop) {
         this.download = download;
         this.parameters = parameters;
         this.identifier = identifier;
         this.eula = eula;
+        this.stop = stop;
     }
 
     @SneakyThrows

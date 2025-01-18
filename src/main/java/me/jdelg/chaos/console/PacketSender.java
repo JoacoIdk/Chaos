@@ -1,11 +1,14 @@
 package me.jdelg.chaos.console;
 
-public class ConnectionSender implements Sender {
-    private final Sender.Type type;
+import me.jdelg.hermes.type.EntityType;
+import net.kyori.adventure.text.Component;
+
+public class PacketSender implements Sender {
+    private final EntityType type;
     private final String name;
 
-    public ConnectionSender(Sender.Type type, String name) {
-        if (type == Type.CONSOLE)
+    public PacketSender(EntityType type, String name) {
+        if (type == EntityType.CONSOLE)
             throw new IllegalStateException("Initializing network sender with console type");
 
         this.type = type;
@@ -13,7 +16,7 @@ public class ConnectionSender implements Sender {
     }
 
     @Override
-    public Type type() {
+    public EntityType type() {
         return type;
     }
 
@@ -24,5 +27,9 @@ public class ConnectionSender implements Sender {
 
     @Override
     public void sendMessage(String message) {
+    }
+
+    @Override
+    public void sendMessage(Component component) {
     }
 }
