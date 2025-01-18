@@ -43,7 +43,7 @@ public enum Platform {
     SPONGE(
             "https://repo.spongepowered.org/repository/maven-releases/org/spongepowered/sponge<type>/<version>-<build>/sponge<type>-<version>-<build>-universal.jar",
             new String[]{"version", "build", "type"},
-            "org/spongepowered/common/applaunch/AppLaunch.class",
+            "org/spongepowered/configurate",
             true,
             "stop",
             true
@@ -51,7 +51,7 @@ public enum Platform {
     PURPUR(
             "https://api.purpurmc.org/v2/purpur/<version>/<build>/download",
             new String[]{"version", "build"},
-            "META-INF/org/purpurmc/purpur/purpur-api",
+            "META-INF/libraries/org/purpurmc/purpur/purpur-api",
             true,
             "stop",
             true
