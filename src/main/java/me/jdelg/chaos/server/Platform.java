@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -18,66 +19,79 @@ public enum Platform {
     PAPER(
             "https://api.papermc.io/v2/projects/paper/versions/<version>/builds/<build>/downloads/paper-<version>-<build>.jar",
             new String[]{"version", "build"},
-            "io.papermc.paperclip.Main",
+            "io/papermc/paperclip/Main.class",
             true,
-            "stop"
+            "stop",
+            true
     ),
     VELOCITY(
             "https://api.papermc.io/v2/projects/velocity/versions/<version>/builds/<build>/downloads/velocity-<version>-<build>.jar",
             new String[]{"version", "build"},
-            "com.velocitypowered.api.proxy.ProxyServer",
+            "com/velocitypowered/api/proxy/ProxyServer.class",
             false,
-            "stop"
+            "stop",
+            true
     ),
-    //SPONGE(
-    //        "https://repo.spongepowered.org/repository/maven-releases/org/spongepowered/sponge<type>/<version>-<build>/sponge<type>-<version>-<build>-universal.jar",
-    //        new String[]{"version", "build", "type"},
-    //        true
-    //),
-    UNKNOWN(null, null, null, false, null);
+    BUNGEECORD(
+            "https://ci.md-5.net/job/BungeeCord/<build>/artifact/bootstrap/target/BungeeCord.jar",
+            new String[]{"build"},
+            "net/md_5/bungee/BungeeCord.class",
+            false,
+            "end",
+            true
+    ),
+    SPONGE(
+            "https://repo.spongepowered.org/repository/maven-releases/org/spongepowered/sponge<type>/<version>-<build>/sponge<type>-<version>-<build>-universal.jar",
+            new String[]{"version", "build", "type"},
+            "org/spongepowered/common/applaunch/AppLaunch.class",
+            true,
+            "stop",
+            true
+    ),
+    PURPUR(
+            "https://api.purpurmc.org/v2/purpur/<version>/<build>/download",
+            new String[]{"version", "build"},
+            "META-INF/org/purpurmc/purpur/purpur-api",
+            true,
+            "stop",
+            true
+    ),
+    UNKNOWN(
+            "",
+            new String[]{},
+            "",
+            false,
+            "stop",
+            false
+    );
 
     private final String download;
     private final String[] parameters;
     private final String identifier;
     private final boolean eula;
     private final String stop;
+    private final boolean supported; // Name's kinda confusing, but is more of a "will attempt to download" than a "supported".
 
-    Platform(String download, String[] parameters, String identifier, boolean eula, String stop) {
+    Platform(String download, String[] parameters, String identifier, boolean eula, String stop, boolean supported) {
         this.download = download;
         this.parameters = parameters;
         this.identifier = identifier;
         this.eula = eula;
         this.stop = stop;
+        this.supported = supported;
     }
 
     public static Platform fromPath(Path path) throws IOException {
-        List<String> classNames = new ArrayList<>();
-        InputStream stream = Files.newInputStream(path);
-        ZipInputStream zip = new ZipInputStream(stream);
-
-        for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
-            if (entry.isDirectory())
-                continue;
-
-            String className = entry.getName();
-
-            if (!className.endsWith(".class"))
-                continue;
-
-            className = className.replace(File.separatorChar, '.');
-            className = className.substring(0, className.length() - ".class".length());
-
-            classNames.add(className);
-        }
-
-        zip.close();
-        stream.close();
+        JarFile jar = new JarFile(path.toString());
+        Platform result = UNKNOWN;
 
         for (Platform platform : values())
-            if (classNames.contains(platform.identifier()))
-                return platform;
+            if (jar.getJarEntry(platform.identifier) != null)
+                result = platform;
 
-        return UNKNOWN;
+        jar.close();
+
+        return result;
     }
 
     public static Platform fromString(String name) {

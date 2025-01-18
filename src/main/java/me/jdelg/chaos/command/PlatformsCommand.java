@@ -13,7 +13,8 @@ public class PlatformsCommand implements Command {
             String message = "<blue>Platforms (Use \"platforms <name>\" for more info)";
 
             for (Platform platform : Platform.values())
-                message += "\n- %s".formatted(platform.name());
+                if (platform.supported())
+                    message += "\n- %s".formatted(platform.name());
 
             message += "</blue>";
 
@@ -25,7 +26,7 @@ public class PlatformsCommand implements Command {
         String name = args[0];
         Platform platform = Platform.fromString(name);
 
-        if (platform == Platform.UNKNOWN) {
+        if (!platform.supported()) {
             sender.sendMessage("<red>That platform is not supported!</red> <yellow>Use \"platforms\" for a list.</yellow>");
             return;
         }

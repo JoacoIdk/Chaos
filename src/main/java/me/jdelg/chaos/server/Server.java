@@ -40,7 +40,7 @@ public class Server {
     public Server(Path path, Platform platform, String[] parameters) throws IOException, URISyntaxException {
         this.path = path;
         this.name = path.getFileName().toString();
-        this.logger = Logger.getLogger("Server " + name);
+        this.logger = Logger.getLogger("Server - " + name);
         this.platform = platform;
         this.secret = Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes());
 

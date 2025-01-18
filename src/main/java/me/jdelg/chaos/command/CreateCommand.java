@@ -22,7 +22,7 @@ public class CreateCommand implements Command {
         String platformName = args[1];
         Platform platform = Platform.fromString(platformName);
 
-        if (platform == Platform.UNKNOWN) {
+        if (!platform.supported()) {
             sender.sendMessage("<red>That platform is not supported!</red> <yellow>Use \"platforms\" for a list.</yellow>");
             return;
         }
