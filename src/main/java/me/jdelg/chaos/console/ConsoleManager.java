@@ -32,7 +32,7 @@ public class ConsoleManager {
         Command command = commandMap.get(name);
 
         if (command == null) {
-            sender.sendMessage("That command does not exist!");
+            sender.sendMessage("<red>That command does not exist!</red> <yellow>Use \"help\" for a list of commands.</yellow>");
             return;
         }
 
