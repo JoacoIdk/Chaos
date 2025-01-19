@@ -46,12 +46,10 @@ public class Server {
         this.platform = platform;
         this.secret = Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes());
 
-        Path secretPath = path.resolve("secret.txt");
-
         Files.createDirectories(path);
 
-        Files.createFile(secretPath);
-        Files.writeString(secretPath, secret);
+        Path secretPath = path.resolve("secret.txt");
+        Files.writeString(secretPath, secret, StandardOpenOption.CREATE);
 
         if (platform.eula()) {
             Files.writeString(
