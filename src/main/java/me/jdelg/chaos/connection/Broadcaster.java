@@ -11,7 +11,10 @@ public class Broadcaster implements Receiver {
     public void receivePacket(InetAddress address, Packet packet) {
         if (Chaos.get().serverManager().serverByAddress(address) == null)
             return;
-        
-        Chaos.get().hermes().broadcast(packet);
+
+        Chaos.get().hermes().send(
+                Chaos.get().serverManager().getAddresses(),
+                packet
+        );
     }
 }

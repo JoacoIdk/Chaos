@@ -4,6 +4,8 @@ import lombok.Getter;
 import me.jdelg.chaos.command.*;
 import me.jdelg.chaos.connection.Broadcaster;
 import me.jdelg.chaos.connection.ConsoleReceiver;
+import me.jdelg.chaos.connection.ServerReceiver;
+import me.jdelg.chaos.connection.StatusReceiver;
 import me.jdelg.chaos.console.ConsoleManager;
 import me.jdelg.chaos.server.ServerManager;
 import me.jdelg.chaos.storage.StorageManager;
@@ -64,9 +66,12 @@ public class Chaos {
         );
         this.consoleManager = new ConsoleManager();
 
-        // This is pretty useless since Helios isn't done yet.
+        // Still useless, but ready for Helios.
+        hermes.registerAllPackets();
         hermes.registerReceiver(new Broadcaster());
         hermes.registerReceiver(new ConsoleReceiver());
+        hermes.registerReceiver(new ServerReceiver());
+        hermes.registerReceiver(new StatusReceiver());
 
         consoleManager.registerCommand("servers", new ServersCommand());
         consoleManager.registerCommand("create", new CreateCommand());

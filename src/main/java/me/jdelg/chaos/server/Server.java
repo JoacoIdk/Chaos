@@ -62,20 +62,12 @@ public class Server {
 
         String download = platform.link();
         String[] parameterNames = platform.parameters();
+        Path software = path.resolve("server.jar");
 
         for (int i = 0; i < parameterNames.length; i++)
             download = download.replace("<%s>".formatted(parameterNames[i]), parameters[i]);
 
-        URL url = new URI(download).toURL();
-        InputStream stream = url.openStream();
-        ReadableByteChannel channel = Channels.newChannel(stream);
-        FileOutputStream file = new FileOutputStream(path.resolve("server.jar").toFile());
-
-        file.getChannel().transferFrom(channel, 0, Long.MAX_VALUE);
-
-        file.close();
-        channel.close();
-        stream.close();
+        FileUtil.downloadFile(download, software);
 
         logger.info("Created server.");
     }

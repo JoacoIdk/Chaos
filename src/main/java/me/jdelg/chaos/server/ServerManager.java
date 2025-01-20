@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -78,6 +79,13 @@ public class ServerManager {
                 .filter(profile -> profile.name().equals(name))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public List<InetAddress> getAddresses() {
+        return servers.stream()
+                .map(Server::address)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     public void reload(boolean force) {
