@@ -85,7 +85,7 @@ Because they accomplish different things:
 
 * Chaos is a server management software
 * Hermes is a networking API
-* Helios is a wrapper for the Velocity and Paper APIs
+* Helios is the implementation of Hermes for Minecraft servers (be it via the Bukkit API, Sponge API, Fabric API, Velocity API, BungeeCord API, or others)
 
 Of course, the three work together, but they are different enought so that merging them would make things more complicated.
 
